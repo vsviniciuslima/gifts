@@ -10,7 +10,7 @@ quarkus:
   http:
     cors:
       ~: true
-      origins: https://vercel-url.com
+      origins: https://nextjs-one-phi-76.vercel.app
       headers: accept, authorization, content-type, x-requested-with
       methods: GET, OPTIONS, POST, DELETE
   hibernate-orm:
