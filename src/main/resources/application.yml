@@ -1,0 +1,24 @@
+quarkus:
+  console:
+    color: true
+  datasource:
+    db-kind: postgresql
+    username: ${APP_DB_USER}
+    password: ${APP_DB_PASSWORD}
+    jdbc:
+      url: ${APP_DB_HOST}
+  http:
+    cors:
+      ~: true
+      origins: https://vercel-url.com
+      headers: accept, authorization, content-type, x-requested-with
+      methods: GET, OPTIONS, POST, DELETE
+  hibernate-orm:
+    database:
+      generation: none
+
+'%dev':
+  quarkus:
+    http:
+      cors:
+        origins: http://localhost:3000
