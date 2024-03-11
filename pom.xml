@@ -47,11 +47,6 @@
       <artifactId>quarkus-rest-client-reactive</artifactId>
     </dependency>
     <dependency>
-      <groupId>io.quarkiverse.jpastreamer</groupId>
-      <artifactId>quarkus-jpastreamer</artifactId>
-      <version>3.0.3.Final</version>
-    </dependency>
-    <dependency>
       <groupId>io.quarkus</groupId>
       <artifactId>quarkus-hibernate-orm-panache</artifactId>
     </dependency>
