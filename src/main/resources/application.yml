@@ -8,8 +8,12 @@ quarkus:
     jdbc:
       url: ${APP_DB_HOST}
   http:
+    proxy:
+      allow-forwarded: true
+      enable-forwarded-host: true
     host: 0.0.0.0
     port: 10000
+    root-path: api
     cors:
       ~: true
       origins: https://nextjs-one-phi-76.vercel.app
