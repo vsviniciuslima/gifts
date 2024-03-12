@@ -18,7 +18,6 @@ import java.util.List;
 @Slf4j
 @Path("/gifts")
 @Produces(MediaType.APPLICATION_JSON)
-@ApplicationPath("/api")
 public class GiftsResource {
 
     @Inject
