@@ -17,10 +17,10 @@ ENV LANGUAGE='en_US:en'
 WORKDIR /app
 
 # Copy the compiled application from the build stage
-COPY --chown=185 target/quarkus-app/lib/ /deployments/lib/
-COPY --chown=185 target/quarkus-app/*.jar /deployments/
-COPY --chown=185 target/quarkus-app/app/ /deployments/app/
-COPY --chown=185 target/quarkus-app/quarkus/ /deployments/quarkus/
+COPY --chown=185 app/target/quarkus-app/lib/ /deployments/lib/
+COPY --chown=185 app/target/quarkus-app/*.jar /deployments/
+COPY --chown=185 app/target/quarkus-app/app/ /deployments/app/
+COPY --chown=185 app/target/quarkus-app/quarkus/ /deployments/quarkus/
 
 # Expose the correct port
 EXPOSE 10000
