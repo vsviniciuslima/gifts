@@ -6,8 +6,10 @@ import dev.vsviniciuslima.confirmations.model.Guest;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
+import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import jakarta.ws.rs.core.UriInfo;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -19,6 +21,7 @@ public class ConfirmationController {
     ConfirmationService service;
 
     @POST
+    @Path("/")
     @Transactional
     @Consumes(MediaType.APPLICATION_JSON)
     public Response confirm(Confirmation confirmation) {

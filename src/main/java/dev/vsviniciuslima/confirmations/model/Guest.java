@@ -2,17 +2,15 @@ package dev.vsviniciuslima.confirmations.model;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.Entity;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @ToString
 @Entity(name = "Guest")
 public class Guest extends PanacheEntity {
     public String name;
     public String mainGuest;
-    public LocalDateTime createdAt;
+    @Getter public LocalDateTime createdAt;
 }
