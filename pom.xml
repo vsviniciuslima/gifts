@@ -96,6 +96,17 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>com.heroku.sdk</groupId>
+        <artifactId>heroku-maven-plugin</artifactId>
+        <version>3.0.7</version>
+        <configuration>
+          <jdkVersion>21</jdkVersion>
+          <processTypes>
+            <web>java $JAVA_OPTS -jar target/quarkus-app/quarkus-run.jar</web>
+          </processTypes>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>${quarkus.platform.group-id}</groupId>
         <artifactId>quarkus-maven-plugin</artifactId>
         <version>${quarkus.platform.version}</version>
