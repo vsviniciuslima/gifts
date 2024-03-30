@@ -3,7 +3,9 @@ package dev.vsviniciuslima.gifts;
 import dev.vsviniciuslima.gifts.model.CreateGift;
 import dev.vsviniciuslima.gifts.model.Gift;
 import dev.vsviniciuslima.gifts.model.BuyGift;
-import dev.vsviniciuslima.gifts.GiftService;
+import dev.vsviniciuslima.gifts.model.Recommendation;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.quarkus.hibernate.orm.panache.PanacheQuery;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -52,22 +54,60 @@ public class GiftsResource {
     }
 
     @GET
-    public Response getGifts() throws InterruptedException {
-        return Response.ok(giftService.listAll()).build();
+    public Response getGifts() {
+        return Response.ok(giftService.search()).build();
     }
 
     @GET
-    @Path("/bought")
-    public Response getBoughtGifts() {
-        return Response.ok(giftService.listBoughtGifts()).build();
+    @Path("/byName")
+    public Response getByName(@QueryParam("name") String name) {
+        PanacheEntityBase gift = Gift.find("name", name)
+                .firstResultOptional()
+                .orElseThrow(() -> new BadRequestException("Gift not found"));
+        return Response.ok(gift).build();
     }
+
+    @GET
+    @Path("/count")
+    public Response countGifts() {
+        return Response.ok(Gift.find("bought", true).count()).build();
+    }
+
+    @GET
+    @Path("/countAvailable")
+    public Response countNotBought() {
+        return Response.ok(Gift.find("bought", false).count()).build();
+    }
+
+
 
     @POST
     @Transactional
     @Path("/{id}/buy")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response buyGift(@PathParam("id") Long id, BuyGift buyGift) throws InterruptedException {
+    public Response buyGift(@PathParam("id") Long id, BuyGift buyGift) {
         Gift gift = giftService.buyGift(id, buyGift);
+        return Response.ok(gift).build();
+    }
+
+    @POST
+    @Transactional
+    @Path("/{id}/recommendations")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response addRecomendations(@PathParam("id") Long id, Recommendation recommendation) {
+        Gift gift = giftService.addRecomendations(id, recommendation);
+        return Response.ok(gift).build();
+    }
+
+    @DELETE
+    @Transactional
+    @Path("/{id}/recommendations")
+    @Consumes(MediaType.APPLICATION_JSON)
+    public Response deleteRecommendations(@PathParam("id") Long id) {
+        Gift gift = Gift.findById(id);
+        if(gift == null) throw new BadRequestException("Gift not found");
+        gift.recommendationUrls.clear();
+        gift.persist();
         return Response.ok(gift).build();
     }
 
@@ -76,6 +116,13 @@ public class GiftsResource {
     @Path("/{id}")
     public Response deleteGift(@PathParam("id") Long id) {
         giftService.deleteGift(id);
+        return Response.noContent().build();
+    }
+
+    @DELETE
+    @Transactional
+    public Response deleteAll() {
+        Gift.deleteAll();
         return Response.noContent().build();
     }
 

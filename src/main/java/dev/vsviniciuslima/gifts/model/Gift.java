@@ -1,6 +1,7 @@
 package dev.vsviniciuslima.gifts.model;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 
 import java.util.List;
@@ -13,6 +14,8 @@ public class Gift extends PanacheEntity {
     public Double price;
     public String category;
 
+    @ElementCollection
+    public List<String> recommendationUrls;
 
     public boolean bought;
     public String buyer;

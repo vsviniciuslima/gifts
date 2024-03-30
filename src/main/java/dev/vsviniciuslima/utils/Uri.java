@@ -3,7 +3,7 @@ package dev.vsviniciuslima.utils;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public class UriLocation {
+public class Uri {
 
     public static URI getGiftsUri(Long id) {
         try {

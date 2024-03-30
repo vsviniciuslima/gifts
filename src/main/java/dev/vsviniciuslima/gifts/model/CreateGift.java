@@ -1,4 +1,6 @@
 package dev.vsviniciuslima.gifts.model;
 
-public record CreateGift(String name, String imageUrl, Double price, String category) {
+import java.util.List;
+
+public record CreateGift(String name, String imageUrl, Double price, String category, List<Recommendation> recommendations){
 }
