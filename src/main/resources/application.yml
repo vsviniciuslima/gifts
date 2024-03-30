@@ -14,7 +14,7 @@ quarkus:
     port: ${PORT:8080}
     cors:
       ~: true
-      origins: https://nextjs-one-phi-76.vercel.app
+      origins: https://juvini-chabar.vercel.app
       headers: accept, authorization, content-type, x-requested-with
       methods: GET, OPTIONS, POST, DELETE
   hibernate-orm:
@@ -23,6 +23,11 @@ quarkus:
 
 '%dev':
   quarkus:
+    hibernate-orm:
+      database:
+        generation: update
     http:
       cors:
         origins: http://localhost:3000
+    live-reload:
+      instrumentation: true
