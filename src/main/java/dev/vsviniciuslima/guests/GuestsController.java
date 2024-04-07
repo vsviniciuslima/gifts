@@ -1,31 +1,31 @@
 package dev.vsviniciuslima.confirmations;
 
 
+import dev.vsviniciuslima.dto.PageRequest;
 import dev.vsviniciuslima.confirmations.model.Confirmation;
-import dev.vsviniciuslima.confirmations.model.Guest;
+import dev.vsviniciuslima.dto.PaginatedResponse;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.core.Context;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.UriInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.microprofile.openapi.annotations.Operation;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 @Slf4j
 @Path("/confirmations")
 @Produces(MediaType.APPLICATION_JSON)
+@Tag(name = "Convidados", description = "Buscar e gerenciar convidados")
 public class ConfirmationController {
 
     @Inject
     ConfirmationService service;
 
     @POST
-    @Path("/")
     @Transactional
     @Consumes(MediaType.APPLICATION_JSON)
     public Response confirm(Confirmation confirmation) {
-        log.info("Confirming {}", confirmation);
         service.confirm(confirmation);
         return Response.ok().build();
     }
@@ -36,16 +36,19 @@ public class ConfirmationController {
     }
 
     @GET
+    @Path("/guests")
+    @Operation(summary = "Listar confirmados", description = "Listar os convidados confirmados")
+    public Response getGuests(@BeanParam PageRequest params ) {
+        log.info("Searching guests with params: {}", params);
+        PaginatedResponse search = service.search(params);
+        log.info("Response: {}", search);
+        return Response.ok(search).build();
+    }
+
+    @GET
     @Path("/count")
     public Response countConfirmations() {
         return Response.ok(service.countConfirmations()).build();
-    }
-    
-    @DELETE
-    @Transactional
-    @Path("/clear")
-    public void clear() {
-        Guest.deleteAll();
     }
 
 }

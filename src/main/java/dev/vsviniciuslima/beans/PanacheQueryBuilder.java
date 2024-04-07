@@ -1,17 +1,15 @@
 package dev.vsviniciuslima.beans;
 
-import dev.vsviniciuslima.gifts.model.Gift;
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
-import io.quarkus.runtime.util.StringUtil;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MultivaluedHashMap;
 import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.UriInfo;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.*;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -20,30 +18,38 @@ public class PanacheQueryBuilder {
 
     @Context
     UriInfo uriInfo;
-    public Optional<PanacheQuery> buildQuery() {
+    public PanacheQueryData buildQuery() {
 
         MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
 
-        if (queryParameters.isEmpty()) return Optional.empty();
+        if (queryParameters.isEmpty())
+            return new PanacheQueryData(Map.of(), "");
 
-        Map<String, Object> nonNullParams = queryParameters.entrySet().stream()
-                .filter( entry -> entry.getValue() != null )
-                .collect( Collectors.toMap( Map.Entry::getKey, entry -> {
-                    String firstValue = entry.getValue().get(0);
-                    if(List.of("false", "true").contains(firstValue)) {
-                        return Boolean.valueOf(firstValue);
-                    }
-                    return firstValue;
-                }));
+        Map<String, Object> acceptedParams = queryParameters.entrySet().stream()
+                .filter(this::filterAcceptedParams)
+                .collect(Collectors.toMap(Map.Entry::getKey, this::getEntryValue));
 
-        String query = nonNullParams.keySet().stream()
+        String query = acceptedParams.keySet().stream()
                 .map(param -> param + "=:" + param)
                 .collect( Collectors.joining(" and ") );
 
-        log.info("query: {}", query);
-        log.info("params: {}", nonNullParams);
-        return Optional.of(new PanacheQuery(nonNullParams, query));
+        return new PanacheQueryData(acceptedParams, query);
 
     }
+
+    private boolean filterAcceptedParams(Map.Entry<String, List<String>> entry) {
+        boolean paramIsAllowed = !List.of("sortDirection", "sortBy", "index", "size").contains(entry.getKey());
+        return paramIsAllowed && entry.getValue() != null;
+    }
+
+    private Object getEntryValue(Map.Entry<String, List<String>> entry) {
+        String firstValue = entry.getValue().get(0);
+        if (List.of("false", "true").contains(firstValue)) {
+            return Boolean.valueOf(firstValue);
+        }
+        return firstValue;
+    }
+
+
 
 }

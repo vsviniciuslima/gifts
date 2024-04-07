@@ -1,27 +1,27 @@
 package dev.vsviniciuslima.confirmations;
 
+import dev.vsviniciuslima.beans.PanacheQueryBuilder;
+import dev.vsviniciuslima.beans.PanacheQueryData;
+import dev.vsviniciuslima.dto.PageRequest;
 import dev.vsviniciuslima.confirmations.model.Confirmation;
 import dev.vsviniciuslima.confirmations.model.Guest;
-import dev.vsviniciuslima.gifts.model.ConfirmationsCount;
-import dev.vsviniciuslima.gifts.model.Gift;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import dev.vsviniciuslima.dto.PaginatedResponse;
+import io.quarkus.panache.common.Page;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.UriInfo;
 import lombok.extern.slf4j.Slf4j;
+import org.jose4j.lang.StringUtil;
 
 import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @ApplicationScoped
 public class ConfirmationService {
 
+    @Context
+    PanacheQueryBuilder panacheQueryBuilder;
     public void confirm(Confirmation confirmation) {
         String principalGuestName = confirmation.principalGuestName();
         LocalDateTime createdAt = LocalDateTime.now();
@@ -59,6 +59,40 @@ public class ConfirmationService {
                     return new Confirmation(mainGuest.name, additionalGuests, mainGuest.createdAt);
                 })
                 .toList();
+    }
+
+    public PaginatedResponse search(PageRequest params) {
+
+        PanacheQueryData query = panacheQueryBuilder.buildQuery();
+        Page page = params.getPage();
+
+        List<Guest> guests = Guest
+                .find(query.query(), params.getSort(), query.params())
+                .page(page)
+                .list();
+
+        List<Guest> finalGuests = guests;
+
+        guests = guests.stream()
+                .filter(guest -> guest.mainGuest != null)
+                .peek(additionalGuest -> additionalGuest.mainGuest = finalGuests.stream()
+                        .filter(guest -> additionalGuest.mainGuest.equals(String.valueOf(guest.id)))
+                        .findFirst()
+                        .map(guest -> guest.name)
+                        .orElseGet(() -> Guest.findById(Long.valueOf(additionalGuest.mainGuest)).toString()))
+                .toList();
+
+        long guestsCount = guests.size();
+
+        return new PaginatedResponse(
+                page.index,
+                page.size,
+                (guestsCount + page.size - 1) / page.size,
+                guestsCount,
+                params.getSortDirection(),
+                params.getSortBy(),
+                guests
+        );
     }
 
     public long countConfirmations() {
