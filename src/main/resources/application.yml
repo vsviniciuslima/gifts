@@ -23,6 +23,11 @@ quarkus:
 
 '%dev':
   quarkus:
+    datasource:
+      username: user
+      password: pwd
+      jdbc:
+        url: jdbc:postgresql://localhost:5432/saas
     hibernate-orm:
       database:
         generation: update
