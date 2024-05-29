@@ -1,9 +1,11 @@
-package dev.vsviniciuslima.confirmations;
+package dev.vsviniciuslima.guests;
 
 
 import dev.vsviniciuslima.dto.PageRequest;
-import dev.vsviniciuslima.confirmations.model.Confirmation;
+import dev.vsviniciuslima.dto.PageResponse;
+import dev.vsviniciuslima.guests.model.Confirmation;
 import dev.vsviniciuslima.dto.PaginatedResponse;
+import dev.vsviniciuslima.guests.model.Guest;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.*;
@@ -13,14 +15,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.microprofile.openapi.annotations.Operation;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
+import java.util.List;
+
 @Slf4j
-@Path("/confirmations")
+@Path("/guests")
 @Produces(MediaType.APPLICATION_JSON)
 @Tag(name = "Convidados", description = "Buscar e gerenciar convidados")
-public class ConfirmationController {
+public class GuestsController {
 
     @Inject
-    ConfirmationService service;
+    GuestsService service;
 
     @POST
     @Transactional
@@ -39,9 +43,7 @@ public class ConfirmationController {
     @Path("/guests")
     @Operation(summary = "Listar confirmados", description = "Listar os convidados confirmados")
     public Response getGuests(@BeanParam PageRequest params ) {
-        log.info("Searching guests with params: {}", params);
-        PaginatedResponse search = service.search(params);
-        log.info("Response: {}", search);
+        PageResponse search = service.search(params);
         return Response.ok(search).build();
     }
 

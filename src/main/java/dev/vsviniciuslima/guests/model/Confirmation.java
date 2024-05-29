@@ -1,4 +1,4 @@
-package dev.vsviniciuslima.confirmations.model;
+package dev.vsviniciuslima.guests.model;
 
 import java.time.LocalDateTime;
 import java.util.List;

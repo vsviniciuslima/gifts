@@ -2,24 +2,22 @@ package dev.vsviniciuslima.gifts;
 
 import dev.vsviniciuslima.beans.PanacheQuery;
 import dev.vsviniciuslima.beans.PanacheQueryBuilder;
+import dev.vsviniciuslima.dto.PageRequest;
+import dev.vsviniciuslima.dto.PageResponse;
 import dev.vsviniciuslima.dto.PaginatedResponse;
 import dev.vsviniciuslima.gifts.model.BuyGift;
 import dev.vsviniciuslima.gifts.model.CreateGift;
 import dev.vsviniciuslima.gifts.model.Gift;
 import dev.vsviniciuslima.gifts.model.Recommendation;
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.quarkus.panache.common.Page;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.core.Context;
-import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.UriInfo;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @ApplicationScoped
@@ -55,19 +53,16 @@ public class GiftService {
         return gift;
     }
 
-    public List<Gift> search() {
-        Optional<PanacheQuery> query = panacheQueryBuilder.buildQuery();
-
-        if(query.isEmpty()) return Gift.listAll();
-
-        return Gift
-                .find(query.get().query(), query.get().params())
-                .list();
+    public PageResponse search(PageRequest params) {
+        PanacheQuery query = panacheQueryBuilder.buildQuery();
+        return Gift.pageResponse(params, query);
     }
 
-    public List<Gift> listAll() {
-        log.info("Listing all gifts");
-        return Gift.listAll();
+    public long count() {
+        PanacheQuery query = panacheQueryBuilder.buildQuery();
+        return Gift
+                .find(query.query(), query.params())
+                .count();
     }
 
     public Gift buyGift(Long id, BuyGift buyGift) {
@@ -86,32 +81,9 @@ public class GiftService {
         return gift;
     }
 
-    public List<Gift> listBoughtGifts() {
-        return Gift.listBoughtGifts();
-    }
-
     public void deleteGift(Long id) {
         log.info("Deleting gift {}", id);
         Gift.deleteById(id);
-    }
-
-    public PaginatedResponse listPaged(int pageIndex, int pageSize) {
-
-        List<PanacheEntityBase> gifts = Gift
-                .find("bought", false)
-                .page(pageIndex, pageSize)
-                .list();
-
-        long count = Gift.count();
-        long totalPages = (count + pageSize - 1) / pageSize;
-
-        return new PaginatedResponse(
-                pageIndex,
-                pageSize,
-                totalPages,
-                count,
-                gifts
-        );
     }
 
     public Gift addRecomendations(Long id, Recommendation recommendation) {
@@ -123,6 +95,14 @@ public class GiftService {
         gift.recommendationUrls.add(recommendation.url());
         gift.persist();
 
+        return gift;
+    }
+
+    public Gift deleteGiftRecommendations(Long id) {
+        Gift gift = Gift.findById(id);
+        if(gift == null) throw new BadRequestException("Gift not found");
+        gift.recommendationUrls.clear();
+        gift.persist();
         return gift;
     }
 }

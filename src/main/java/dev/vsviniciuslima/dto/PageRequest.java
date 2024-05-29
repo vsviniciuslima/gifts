@@ -1,4 +1,4 @@
-package dev.vsviniciuslima.config;
+package dev.vsviniciuslima.dto;
 
 import io.quarkus.panache.common.Page;
 import io.quarkus.panache.common.Sort;
@@ -29,12 +29,8 @@ public class PageRequest {
     }
 
     public Page getPage() {
-        if(size == 0) {
-            return Page.of(0, Integer.MAX_VALUE);
-        } else {
-            return Page.of(index, size);
-        }
+        return size == 0
+                ? Page.of(0, Integer.MAX_VALUE)
+                : Page.of(index, size);
     }
-
-
 }

@@ -1,24 +1,25 @@
-package dev.vsviniciuslima.confirmations;
+package dev.vsviniciuslima.guests;
 
 import dev.vsviniciuslima.beans.PanacheQueryBuilder;
-import dev.vsviniciuslima.beans.PanacheQueryData;
+import dev.vsviniciuslima.beans.PanacheQuery;
 import dev.vsviniciuslima.dto.PageRequest;
-import dev.vsviniciuslima.confirmations.model.Confirmation;
-import dev.vsviniciuslima.confirmations.model.Guest;
-import dev.vsviniciuslima.dto.PaginatedResponse;
-import io.quarkus.panache.common.Page;
+import dev.vsviniciuslima.dto.PageResponse;
+import dev.vsviniciuslima.guests.model.Confirmation;
+import dev.vsviniciuslima.guests.model.Guest;
 import io.quarkus.panache.common.Sort;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.ws.rs.core.Context;
 import lombok.extern.slf4j.Slf4j;
-import org.jose4j.lang.StringUtil;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @ApplicationScoped
-public class ConfirmationService {
+public class GuestsService {
 
     @Context
     PanacheQueryBuilder panacheQueryBuilder;
@@ -33,14 +34,14 @@ public class ConfirmationService {
         principalGuest.persist();
         log.info("Persisted principal guest: {}", principalGuestName);
 
-        confirmation.guests().forEach(guestName -> {
+        for(String guestName : confirmation.guests()) {
             Guest additionalGuest = new Guest();
             additionalGuest.name = guestName;
             additionalGuest.mainGuest = principalGuest.id.toString();
             additionalGuest.createdAt = createdAt;
             additionalGuest.persist();
             log.info("Persisted additional guest: {}", guestName);
-        });
+        }
         log.info("Persisted all guests for principal guest {} at {}", principalGuestName, createdAt);
     }
 
@@ -61,38 +62,28 @@ public class ConfirmationService {
                 .toList();
     }
 
-    public PaginatedResponse search(PageRequest params) {
+    public PageResponse search(PageRequest params) {
 
-        PanacheQueryData query = panacheQueryBuilder.buildQuery();
-        Page page = params.getPage();
+        PanacheQuery query = panacheQueryBuilder.buildQuery();
 
-        List<Guest> guests = Guest
-                .find(query.query(), params.getSort(), query.params())
-                .page(page)
-                .list();
+        List<Guest> guests = Guest.page(params, query);
 
-        List<Guest> finalGuests = guests;
+        Map<Long, Guest> guestMap = guests.stream()
+                .collect(Collectors.toMap(guest -> guest.id, guest -> guest));
 
         guests = guests.stream()
                 .filter(guest -> guest.mainGuest != null)
-                .peek(additionalGuest -> additionalGuest.mainGuest = finalGuests.stream()
-                        .filter(guest -> additionalGuest.mainGuest.equals(String.valueOf(guest.id)))
-                        .findFirst()
-                        .map(guest -> guest.name)
-                        .orElseGet(() -> Guest.findById(Long.valueOf(additionalGuest.mainGuest)).toString()))
+                .peek(guest -> guest.mainGuest = getMainGuestName(guest.mainGuest, guestMap))
                 .toList();
 
-        long guestsCount = guests.size();
+        return new PageResponse(params, guests);
+    }
 
-        return new PaginatedResponse(
-                page.index,
-                page.size,
-                (guestsCount + page.size - 1) / page.size,
-                guestsCount,
-                params.getSortDirection(),
-                params.getSortBy(),
-                guests
-        );
+    private String getMainGuestName(String mainGuestIdStr, Map<Long, Guest> guestMap) {
+        Long mainGuestId = Long.valueOf(mainGuestIdStr);
+
+        return guestMap.containsKey(mainGuestId) ? guestMap.get(mainGuestId).name
+                : Guest.findById(mainGuestId).toString();
     }
 
     public long countConfirmations() {

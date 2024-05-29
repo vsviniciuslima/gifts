@@ -1,16 +1,20 @@
-package dev.vsviniciuslima.confirmations.model;
+package dev.vsviniciuslima.guests.model;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import dev.vsviniciuslima.beans.PageablePanacheEntity;
 import jakarta.persistence.Entity;
-import lombok.*;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @ToString
 @Entity(name = "Guest")
-public class Guest extends PanacheEntity {
+public class Guest extends PageablePanacheEntity {
     public String name;
     public String mainGuest;
+    public long mainGuestId;
+    public boolean active;
     @Getter public LocalDateTime createdAt;
+    @Getter public LocalDateTime updatedAt;
+
 }

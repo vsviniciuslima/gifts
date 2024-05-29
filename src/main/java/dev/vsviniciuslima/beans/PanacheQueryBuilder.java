@@ -6,10 +6,8 @@ import jakarta.ws.rs.core.MultivaluedMap;
 import jakarta.ws.rs.core.UriInfo;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -18,12 +16,12 @@ public class PanacheQueryBuilder {
 
     @Context
     UriInfo uriInfo;
-    public PanacheQueryData buildQuery() {
+    public PanacheQuery buildQuery() {
 
         MultivaluedMap<String, String> queryParameters = uriInfo.getQueryParameters();
 
         if (queryParameters.isEmpty())
-            return new PanacheQueryData(Map.of(), "");
+            return new PanacheQuery(Map.of(), "");
 
         Map<String, Object> acceptedParams = queryParameters.entrySet().stream()
                 .filter(this::filterAcceptedParams)
@@ -33,7 +31,7 @@ public class PanacheQueryBuilder {
                 .map(param -> param + "=:" + param)
                 .collect( Collectors.joining(" and ") );
 
-        return new PanacheQueryData(acceptedParams, query);
+        return new PanacheQuery(acceptedParams, query);
 
     }
 

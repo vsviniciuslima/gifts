@@ -6,7 +6,7 @@ import io.quarkus.jackson.ObjectMapperCustomizer;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public class ObjectMapperConfig implements ObjectMapperCustomizer {
+public class CustomObjectMapper implements ObjectMapperCustomizer {
 
     @Override
     public void customize(ObjectMapper objectMapper) {
