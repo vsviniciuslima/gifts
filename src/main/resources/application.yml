@@ -20,6 +20,16 @@ quarkus:
   hibernate-orm:
     database:
       generation: none
+  smallrye-openapi:
+    info-license-url: https://www.apache.org/licenses/LICENSE-2.0.html
+    info-version: 1.0.1
+    info-contact-email: vsviniciuslima@gmail.com
+    info-contact-url: https://vsviniciuslima.dev/contact
+    info-license-name: Apache 2.0
+    info-title: E-vento
+    info-description: Serviços para gerenciamento de eventos
+    info-terms-of-service: Your terms here
+    info-contact-name: Vinicius Santana
 
 '%dev':
   quarkus:
