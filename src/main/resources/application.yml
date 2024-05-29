@@ -16,7 +16,7 @@ quarkus:
       ~: true
       origins: https://juvini-chabar.vercel.app
       headers: accept, authorization, content-type, x-requested-with
-      methods: GET, OPTIONS, POST, DELETE
+      methods: GET, OPTIONS, POST, DELETE, PATCH, PUT
   hibernate-orm:
     database:
       generation: none
