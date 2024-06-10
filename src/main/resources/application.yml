@@ -1,3 +1,9 @@
+whatsapp:
+  allowedNumbers: [
+    '+5511910844014',
+    '+5511940785047',
+    '+5511988256762'
+  ]
 quarkus:
   console:
     color: true
@@ -30,7 +36,6 @@ quarkus:
     info-description: Serviços para gerenciamento de eventos
     info-terms-of-service: Your terms here
     info-contact-name: Vinicius Santana
-
 '%dev':
   quarkus:
     datasource:
@@ -40,9 +45,10 @@ quarkus:
         url: jdbc:postgresql://localhost:5432/saas
     hibernate-orm:
       database:
-        generation: update
+        generation: drop-and-create
     http:
       cors:
         origins: http://localhost:3000
     live-reload:
       instrumentation: true
+      watched-resources: dev.vsviniciuslima.whatsapp.connections.listeners.MessageListener
