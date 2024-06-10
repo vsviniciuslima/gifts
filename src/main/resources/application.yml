@@ -52,3 +52,7 @@ quarkus:
     live-reload:
       instrumentation: true
       watched-resources: dev.vsviniciuslima.whatsapp.connections.listeners.MessageListener
+'%test':
+  quarkus:
+    datasource:
+      db-kind: h2
