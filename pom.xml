@@ -29,6 +29,10 @@
   </dependencyManagement>
   <dependencies>
     <dependency>
+      <groupId>io.quarkus</groupId>
+      <artifactId>quarkus-jdbc-h2</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.github.auties00</groupId>
       <artifactId>cobalt</artifactId>
       <version>0.0.5</version>
