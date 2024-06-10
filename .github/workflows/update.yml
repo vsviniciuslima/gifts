@@ -6,7 +6,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Java CI with Maven
+name: Update version
 
 on:
   push:
@@ -35,7 +35,12 @@ jobs:
     # Update project version
     - name: Setup Node.js environment
       uses: actions/setup-node@v4.0.2
-
+      
+    - name: Set Git Credentials
+      run: |
+        git config --global user.email "bot@outcomecloud.com"
+        git config --global user.name "Outcome Bot"
+        
     - name: Check for Changelog
       id: check_files
       uses: andstor/file-existence-action@v1
